@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672601575967",
+    "project_id": "donor-spot-b3922",
+    "storage_bucket": "donor-spot-b3922.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672601575967:android:66ce1975efed75cce7fb2a",
+        "android_client_info": {
+          "package_name": "com.sandeep.donorspot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDAHr8GPqTb_8AGlEikbZgQKOdv_QAd1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
