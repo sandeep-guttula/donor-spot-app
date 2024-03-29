@@ -6,13 +6,17 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { colors } from "@/constants/Colors";
 import ReactNativePhoneInput from "react-native-phone-input";
 import OTPInputView from "react-native-expo-opt-input";
 import { StatusBar } from "expo-status-bar";
-import auth from "@react-native-firebase/auth";
+import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { useUserStore } from "@/store/userStore";
+import { getUserDataThroughFirebaseUid, isUserExist } from "@/gql/user_queries";
+import { router } from "expo-router";
 
 const register = () => {
   const [phone, setPhone] = useState("");
@@ -21,9 +25,21 @@ const register = () => {
   const [loading, setLoading] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  function onAuthStateChanged(user: any) {
+  const setPhoneNumber = useUserStore((state) => state.setPhoneNumber);
+  const setFirebaseUID = useUserStore((state) => state.setFirebaseUID);
+  const setUserId = useUserStore((state) => state.setUserId);
+  const setUserName = useUserStore((state) => state.setUserName);
+  const setUserEmail = useUserStore((state) => state.setUserEmail);
+  const setUserAge = useUserStore((state) => state.setUserAge);
+  const setUserGender = useUserStore((state) => state.setUserGender);
+  const setUserBloodType = useUserStore((state) => state.setUserBloodType);
+  const setUserCity = useUserStore((state) => state.setUserCity);
+  const setUserPinCode = useUserStore((state) => state.setUserPinCode);
+  const user = useUserStore((state) => state.user);
+
+  function onAuthStateChanged(user: FirebaseAuthTypes.User | null) {
     if (user) {
-      console.log("User: ", user);
+      console.log("User: ", user.uid);
     }
   }
 
@@ -33,17 +49,39 @@ const register = () => {
   }, []);
 
   const sendCode = async () => {
+    setLoading(true);
     const confirmation = await auth().signInWithPhoneNumber(phone);
     setConfirmationResult(confirmation);
-    console.log("Confirmation: ", confirmation);
+    console.log("Confirmation: ", confirmation.verificationId);
+    setLoading(false);
     setShowOTP(true);
   };
+
   const confirmCode = async () => {
     try {
       setLoading(true);
       const userCredentials = await confirmationResult.confirm(OTP);
-      console.log("UserCredentials: ", userCredentials);
+      const user = userCredentials?.user;
+      if (!user?.uid) {
+        setLoading(false);
+        console.log("User not created");
+        return;
+      }
+      setFirebaseUID(user.uid);
+      setPhoneNumber(phone);
+
+      const userExist = await isUserExist(user.uid);
+      if (userExist) {
+
+        const response = await  getUserDataThroughFirebaseUid(user.uid)
+        console.log("Register ",response);
+        
+        router.navigate("(tabs)/");
+        setLoading(false);
+        return;
+      }
       setLoading(false);
+      router.push("/auth/new-user/newUser");
     } catch (error) {
       console.log("Invalid code.", error);
       setLoading(false);
@@ -89,6 +127,7 @@ const register = () => {
           </View>
           <Pressable style={styles.buttonStyle} onPress={() => confirmCode()}>
             <Text style={styles.btnText}>Verify</Text>
+            {loading && <ActivityIndicator size="small" color="white" />}
           </Pressable>
         </View>
       ) : (
@@ -115,6 +154,7 @@ const register = () => {
             </View>
             <Pressable style={styles.buttonStyle} onPress={() => sendCode()}>
               <Text style={styles.btnText}>Continue</Text>
+              {loading && <ActivityIndicator size="small" color="white" />}
             </Pressable>
           </View>
           <View>
@@ -181,6 +221,7 @@ const styles = StyleSheet.create({
   buttonStyle: {
     backgroundColor: colors.primary,
     // width: "85%",
+    flexDirection: "row",
     height: 50,
     borderRadius: 10,
     justifyContent: "center",
