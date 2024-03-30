@@ -45,6 +45,14 @@ mutation Register($firebaseUid: String!, $fullName: String!, $email: String!, $p
 }
 `
 
+const updateActiveForDonationQuery = `
+  mutation UpdateActiveForDonation($updateActiveForDonationId: ID!, $activeForDonation: Boolean!) {
+  updateActiveForDonation(id: $updateActiveForDonationId, activeForDonation: $activeForDonation) {
+    activeForDonation
+  }
+}
+`
+
 const getUsersName = `
   query Users {
     users {
@@ -139,4 +147,23 @@ async function addUser(
   }
 }
 
-export { isUserExist, addUser, getUserDataThroughFirebaseUid }
+async function updateActiveForDonation(id: string, activeForDonation: boolean) {
+
+  const response = await fetch(GQL_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: updateActiveForDonationQuery,
+      variables: {
+        updateActiveForDonationId: id,
+        activeForDonation: activeForDonation
+      }
+    })
+  })
+  let { data } = await response.json();
+  return data.updateActiveForDonation
+}
+
+export { isUserExist, addUser, getUserDataThroughFirebaseUid, updateActiveForDonation }

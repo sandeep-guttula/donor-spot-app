@@ -35,7 +35,9 @@ const register = () => {
   const setUserBloodType = useUserStore((state) => state.setUserBloodType);
   const setUserCity = useUserStore((state) => state.setUserCity);
   const setUserPinCode = useUserStore((state) => state.setUserPinCode);
-  const setActiveForDonation = useUserStore((state) => state.setActiveForDonation);
+  const setActiveForDonation = useUserStore(
+    (state) => state.setActiveForDonation
+  );
   const userData = useUserStore((state) => state.user);
 
   function onAuthStateChanged(user: FirebaseAuthTypes.User | null) {
@@ -73,8 +75,7 @@ const register = () => {
 
       const userExist = await isUserExist(user.uid);
       if (userExist) {
-
-        const response = await  getUserDataThroughFirebaseUid(user.uid)
+        const response = await getUserDataThroughFirebaseUid(user.uid);
         setUserId(response.id);
         setUserName(response.fullName);
         setUserEmail(response.email);
@@ -84,7 +85,7 @@ const register = () => {
         setUserCity(response.address.city);
         setUserPinCode(response.address.pincode);
         setActiveForDonation(response.activeForDonation);
-        console.log("User: ", userData);
+        console.log("UserData: ", userData);
         router.navigate("(tabs)/");
         setLoading(false);
         return;

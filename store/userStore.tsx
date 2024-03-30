@@ -15,7 +15,7 @@ export type UserStore = {
   setUserBloodType: (bloodType: string) => void;
   setUserCity: (city: string) => void;
   setUserPinCode: (pinCode: string) => void;
-  setActiveForDonation : (activeForDonation: boolean) => void
+  setActiveForDonation: (activeForDonation: boolean) => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -118,8 +118,8 @@ export const useUserStore = create<UserStore>((set) => ({
     set((state) => ({
       user: {
         ...state.user!,
-        activeForDonaton: active,
+        activeForDonation: active,
       },
     }));
-  }
+  },
 }));

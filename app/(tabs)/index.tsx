@@ -7,18 +7,51 @@ import {
   SafeAreaView,
   Pressable,
   Image,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import { Switch } from "@gluestack-ui/themed";
+import { set, Switch } from "@gluestack-ui/themed";
 import { useUserStore } from "@/store/userStore";
 import { StatusBar } from "expo-status-bar";
 import { colors } from "@/constants/Colors";
 import { Feather } from "@expo/vector-icons";
 import RequestCard from "@/components/RequestCard";
 import { Ionicons } from "@expo/vector-icons";
+// import messaging from "@react-native-firebase/messaging";
+import { useEffect, useState } from "react";
+import { usePushNotifications } from "@/components/usePushNotifications";
+import { updateActiveForDonation } from "@/gql/user_queries";
 
 export default function TabOneScreen() {
   const user = useUserStore((state) => state.user);
-  console.log(user);
+
+  const [activeForDonationLoading, setActiveForDonationLoading] =
+    useState(false);
+  const [_activeForDonation, _setActiveForDonation] = useState(
+    user?.activeForDonation
+  );
+
+  const setActiveForDonation = useUserStore(
+    (state) => state.setActiveForDonation
+  );
+
+  useEffect(() => {
+    console.log("activeForDonation: ");
+    console.log(user);
+  }, []);
+
+  const handleActiveForDonation = async () => {
+    setActiveForDonationLoading(true);
+    const data = await updateActiveForDonation(
+      user?.id!,
+      !user?.activeForDonation!
+    );
+    setActiveForDonation(data.activeForDonation);
+    console.log(data);
+    setActiveForDonationLoading(false);
+  };
+
   return user?.id ? (
     <>
       <StatusBar style="inverted" />
@@ -30,11 +63,19 @@ export default function TabOneScreen() {
           </View>
           <Text style={styles.title}>Kakinada</Text>
           {/* <View style={styles.separator} /> */}
+
           <View style={styles.activeDonation}>
             <Text style={{ fontSize: 16, fontWeight: "bold" }}>
               Currently willing to Donate
             </Text>
-            <Switch size="md" value={user?.activeForDonation} />
+            {activeForDonationLoading && (
+              <ActivityIndicator color="white" size="small" />
+            )}
+            <Switch
+              size="md"
+              value={user?.activeForDonation!}
+              onChange={() => handleActiveForDonation()}
+            />
           </View>
           <View style={styles.bloodTypeContainer}>
             <Text style={{ fontSize: 16, fontWeight: "bold" }}>
@@ -46,7 +87,7 @@ export default function TabOneScreen() {
 
         <View style={styles.requestsContainer}>
           <View style={styles.requestHeaderContainer}>
-            <Text style={styles.requestHeader}>Your Request:</Text>
+            <Text style={styles.requestHeader}>Requests for you:</Text>
             <View
               style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
             >
