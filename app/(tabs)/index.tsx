@@ -1,40 +1,210 @@
 import { router } from "expo-router";
-import { StyleSheet, View, Text, Button } from "react-native";
-import { Switch } from '@gluestack-ui/themed';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  SafeAreaView,
+  Pressable,
+  Image,
+} from "react-native";
+import { Switch } from "@gluestack-ui/themed";
 import { useUserStore } from "@/store/userStore";
+import { StatusBar } from "expo-status-bar";
+import { colors } from "@/constants/Colors";
+import { Feather } from "@expo/vector-icons";
+import RequestCard from "@/components/RequestCard";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabOneScreen() {
   const user = useUserStore((state) => state.user);
   console.log(user);
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      
-      <Switch size="md" isDisabled={user?.activeForDonation}  />
-      
-      <View style={styles.separator} />
-      <Button title="Login" onPress={() => router.push("/auth/register")} />
-      <Button
-        title="Go to new user"
-        onPress={() => router.push("/auth/new-user/newUser")}
-      />
-    </View>
+  return user?.id ? (
+    <>
+      <StatusBar style="inverted" />
+      <View style={styles.container}>
+        <View style={styles.activeCard}>
+          <View style={styles.cardEdit}>
+            <Text style={styles.cardTitle}>Location</Text>
+            <Feather name="edit-3" size={16} color="white" />
+          </View>
+          <Text style={styles.title}>Kakinada</Text>
+          {/* <View style={styles.separator} /> */}
+          <View style={styles.activeDonation}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              Currently willing to Donate
+            </Text>
+            <Switch size="md" value={user?.activeForDonation} />
+          </View>
+          <View style={styles.bloodTypeContainer}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              Your Blood type
+            </Text>
+            <Text style={styles.bloodType}>O+</Text>
+          </View>
+        </View>
+
+        <View style={styles.requestsContainer}>
+          <View style={styles.requestHeaderContainer}>
+            <Text style={styles.requestHeader}>Your Request:</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
+            >
+              <Ionicons name="reload-outline" size={16} color="black" />
+              <Text style={styles.requestSeeAll}>See All</Text>
+            </View>
+          </View>
+          <RequestCard />
+        </View>
+
+        <Button title="Login" onPress={() => router.push("/auth/register")} />
+        <Button
+          title="Go to new user"
+          onPress={() => router.push("/auth/new-user/newUser")}
+        />
+      </View>
+    </>
+  ) : (
+    <SafeAreaView>
+      <StatusBar style="inverted" />
+      <View style={onBoardingStyles.container}>
+        <Image
+          source={require("@/assets/images/welcome.png")}
+          style={onBoardingStyles.imageStyle}
+        />
+        <View style={onBoardingStyles.textContainer}>
+          <Text style={onBoardingStyles.header}>Welcome to DonorSpot</Text>
+          <Text style={onBoardingStyles.subText}>
+            Be a lifeline: donate blood today
+          </Text>
+          <Pressable
+            onPress={() => router.push("/auth/register")}
+            style={[onBoardingStyles.buttonStyle]}
+          >
+            <Text style={onBoardingStyles.btnText}>Get Stated</Text>
+          </Pressable>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 20,
+    backgroundColor: "white",
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    rowGap: 30,
+    // justifyContent: "center",
+  },
+  activeCard: {
+    width: "90%",
+    // height: 100,
+    gap: 16,
+    borderRadius: 10,
+    backgroundColor: colors.backgroundPrimary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
   },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 26,
+    fontWeight: "900",
+    color: "white",
+  },
+  cardEdit: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  activeDonation: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: "80%",
+  },
+  bloodTypeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  bloodType: {
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    fontSize: 18,
+    fontWeight: "900",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    color: "white",
+  },
+  // Your request styles
+  requestsContainer: {
+    width: "90%",
+    // gap: 16,
+    borderRadius: 10,
+    // paddingHorizontal: 14,
+    // paddingVertical: 10,
+  },
+  requestHeaderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    // padding: 10
+  },
+  requestHeader: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  requestSeeAll: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: colors.linkBlue,
+    textDecorationLine: "underline",
+  },
+});
+
+const onBoardingStyles = StyleSheet.create({
+  container: {
+    // justifyContent: "center",
+    paddingTop: 60,
+    alignItems: "center",
+    justifyContent: "space-around",
+    color: "black",
+    height: "100%",
+  },
+  imageStyle: {
+    width: 420,
+    height: 420,
+  },
+  header: {
+    fontSize: 35,
+    fontWeight: "bold",
+  },
+  textContainer: {
+    alignItems: "center",
+    gap: 20,
+  },
+  subText: {
+    fontSize: 20,
+    color: "gray",
+  },
+  buttonStyle: {
+    backgroundColor: colors.primary,
+    width: 360,
+    height: 50,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

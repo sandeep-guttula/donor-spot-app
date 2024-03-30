@@ -7,7 +7,9 @@ const colors = {
   linkBlue: "#3C9AFB",
   backgroundPrimary: "#FF395D",
   textGray: "#b9b9b9",
-  green: "#8ddf40"
+  green: "#8ddf40",
+  cardBackground: "#F0F1F1",
+  textDarkGray: "#525159"
 }
 
 

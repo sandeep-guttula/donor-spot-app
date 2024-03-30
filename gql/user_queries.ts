@@ -62,14 +62,13 @@ async function getUserDataThroughFirebaseUid(firebaseUid: string) {
     body: JSON.stringify({
       query: getUserByFirebaseUid,
       variables: {
-        userId: firebaseUid
+        firebaseUid: firebaseUid
       }
     })
   })
-  let data = await response.json();
-  console.log("data from: getFirebaseUserIDFUnction", data);
+  let { data } = await response.json();
 
-  return data
+  return data.findUserByFirebaseUID
 }
 
 async function isUserExist(firebaseUid: string) {
